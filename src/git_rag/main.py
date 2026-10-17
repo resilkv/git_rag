@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from git_rag.service import ask_repository
+from pydantic import BaseModel, HttpUrl
 
 app = FastAPI(title="Ask Your Repository")
 
@@ -15,10 +16,11 @@ def health_check():
 from pydantic import BaseModel
 
 class AskRequest(BaseModel):
-    question:  str
+    repo_url: HttpUrl
+    question: str
 
 
 @app.post("/ask")
 def ask_endpoint(request: AskRequest):
-    return {"answer": ask_repository(request.question)}
+    return ask_repository(str(request.repo_url), request.question)
 
